@@ -1,5 +1,6 @@
 from passlib.context import CryptContext
-from config import config
+# from config import config
+from src.config import config
 
 # to get a string like this run:
 # openssl rand -hex 32
