@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Body
 from fastapi.encoders import jsonable_encoder
-from auth.models import UserLoginSchema, UserSignupSchema
+# from auth.models import UserLoginSchema, UserSignupSchema
+from src.auth.models import UserLoginSchema, UserSignupSchema
 # from models.users import User
 from datetime import datetime
 # from database import db
