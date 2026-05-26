@@ -6,7 +6,9 @@ from fastapi.responses import Response
 # from database import db
 from src.database import db
 
-from models.products import Product, UpdateProduct
+# from models.products import Product, UpdateProduct
+from src.models.products import Product, UpdateProduct
+
 from datetime import datetime
 from bson import ObjectId
 
