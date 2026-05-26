@@ -6,7 +6,8 @@ from fastapi.security import OAuth2PasswordBearer
 from fastapi import Depends, HTTPException, status
 from passlib.context import CryptContext
 
-from auth import SECRET_KEY, ALGORITHM
+# from auth import SECRET_KEY, ALGORITHM
+from src.auth import SECRET_KEY, ALGORITHM
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
