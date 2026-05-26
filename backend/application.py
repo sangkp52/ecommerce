@@ -9,7 +9,8 @@ from fastapi import FastAPI
 from src.routers.users import router as users_routers
 from src.routers.products import router as products_routers
 from src.middlewares.cors import apply_cors_middleware
-from src.routers import api_router
+# from src.routers import api_router
+from src.routers import api_router, root_router
 from src.auth.router import router as auth_router
 
 def create_app() -> FastAPI:
@@ -21,12 +22,10 @@ def create_app() -> FastAPI:
     # Configuring routers
     app.include_router(api_router)
     app.include_router(root_router)
-    
+
     app.include_router(auth_router)
     app.include_router(users_routers)
     app.include_router(products_routers)
-
-   
 
     return app
 
