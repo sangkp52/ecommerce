@@ -24,51 +24,22 @@ async def login(user: UserLoginSchema = Body(...)):
     else:
         return {"error", "password is incorrect."}
 
+@router.post("/signup", tags=["Auth"])
+async def signup(user: UserSignupSchema = Body(...)):
+    already_exists = await db["users"].find_one({"email": user.email })
 
+    if already_exists:
+        return { "error": "User already exists" }
 
-# @router.post("/signup", tags=["Auth"])
-# async def signup(user: UserSignupSchema = Body(...)):
-#     already_exists = await db["users"].find_one({"email": user.email })
-
-#     if already_exists:
-#         return { "error": "User already exists" }
-
-#     # if user.password != user.password_confirmation:
-#     #     return { "error": "Passwords are different" }
+    if user.password != user.password_confirmation:
+        return { "error": "Passwords are different" }
     
-    
-#     hashed = hash_password(user.password)
-#     new_user = {
-#         "email": user.email,
-#         "password": hashed,
-#         "created_at": datetime.utcnow(),
-#         "updated_at": datetime.utcnow()
-#     }
-#     created = await db["users"].insert_one(new_user)
-#     return jsonable_encoder(created)
-@router.post("/signup")
-async def signup(user: UserSignupSchema):
-    try:
-        print("SIGNUP HIT:", user)
-
-        already_exists = await db["users"].find_one({"email": user.email})
-        if already_exists:
-            return {"error": "User already exists"}
-
-        hashed = hash_password(user.password)
-
-        new_user = {
-            "email": user.email,
-            "password": hashed,
-        }
-
-        result = await db["users"].insert_one(new_user)
-
-        return {
-            "id": str(result.inserted_id),
-            "email": user.email
-        }
-
-    except Exception as e:
-        print("SIGNUP ERROR:", e)
-        return {"error": str(e)}
+    hashed = hash_password(user.password)
+    new_user = {
+        "email": user.email,
+        "password": hashed,
+        "created_at": datetime.utcnow(),
+        "updated_at": datetime.utcnow()
+    }
+    created = await db["users"].insert_one(new_user)
+    return jsonable_encoder(created)

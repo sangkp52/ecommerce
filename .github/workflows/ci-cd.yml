@@ -27,3 +27,11 @@ jobs:
       run: |
         cd backend
         pytest -v
+
+    - name: SonarQube Scan
+      run: |
+        sonar-scanner \
+        -Dsonar.projectKey=ecommerce \
+        -Dsonar.sources=. \
+        -Dsonar.host.url=http://localhost:9000 \
+        -Dsonar.login=$SONAR_TOKEN

@@ -1,4 +1,3 @@
-
 from passlib.context import CryptContext
 from config import config
 

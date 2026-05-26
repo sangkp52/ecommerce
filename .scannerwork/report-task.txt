@@ -1,0 +1,6 @@
+projectKey=ecommerce_fastapi_react
+serverUrl=http://localhost:9000
+serverVersion=9.9.8.100196
+dashboardUrl=http://localhost:9000/dashboard?id=ecommerce_fastapi_react
+ceTaskId=AZ5kOrFeX5JSCV5Myak3
+ceTaskUrl=http://localhost:9000/api/ce/task?id=AZ5kOrFeX5JSCV5Myak3
