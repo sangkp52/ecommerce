@@ -8,7 +8,7 @@ from datetime import datetime
 # from auth.utils import hash_password, verify_password, create_access_token
 
 from src.database import db
-from src.models.user import User
+from models.user import User
 from src.auth.utils import hash_password, verify_password, create_access_token
 
 
