@@ -1,8 +1,8 @@
-name: CI-CD Pipeline
+name: CI Test
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build-test:
@@ -10,23 +10,20 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Setup Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: "3.11"
 
     - name: Install dependencies
       run: |
-        cd backend
-        pip install -r requirements.txt
+        python -m pip install --upgrade pip
+        pip install pytest
+        if [ -f backend/requirements.txt ]; then pip install -r backend/requirements.txt; fi
 
     - name: Run tests
       run: |
         cd backend
         pytest
-    
-    - name: Build Docker image
-      run: |
-        docker build -t ecommerce-backend ./backend
