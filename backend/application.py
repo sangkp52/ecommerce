@@ -24,9 +24,7 @@ def create_app() -> FastAPI:
     app.include_router(users_routers)
     app.include_router(products_routers)
 
-@app.get("/")
-def root():
-    return RedirectResponse(url="/docs")
+    app.include_router(root_router)
 
     return app
 

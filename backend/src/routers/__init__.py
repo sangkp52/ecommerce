@@ -6,3 +6,10 @@ from fastapi import APIRouter
 api_router = APIRouter(prefix="/api/v1")
 api_router.include_router(product_router)
 api_router.include_router(user_router)
+
+
+router = APIRouter()
+
+@router.get("/")
+def root():
+    return RedirectResponse(url="/docs")
