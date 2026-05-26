@@ -1,10 +1,14 @@
 from fastapi import APIRouter, Body
 from fastapi.encoders import jsonable_encoder
 from auth.models import UserLoginSchema, UserSignupSchema
-from models.users import User
+# from models.users import User
 from datetime import datetime
-from database import db
-from auth.utils import hash_password, verify_password, create_access_token
+# from database import db
+# from auth.utils import hash_password, verify_password, create_access_token
+
+from src.database import db
+from src.models.user import User
+from src.auth.utils import hash_password, verify_password, create_access_token
 
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
