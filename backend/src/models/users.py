@@ -1,5 +1,5 @@
 from typing import Union
-from models.common import CommonModel
+from src.models.common import CommonModel
 
 
 class User(CommonModel):
