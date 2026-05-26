@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from config import config
+# from config import config
+from src.config import config
 
 origins = config.get("CORS", "").split(",")
 print("cors: ", origins)
