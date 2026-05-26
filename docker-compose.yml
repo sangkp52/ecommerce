@@ -7,7 +7,8 @@ services:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: admin123
     ports:
-      - "27017:27017"
+      # - "27017:27017"
+      - "27018:27017"
     volumes:
       - mongodb_data_container:/data/db
 
@@ -15,7 +16,8 @@ services:
     image: mongo-express
     restart: always
     ports:
-      - "8081:8081"
+      # - "8081:8081"
+      - "8083:8081"
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: admin
       ME_CONFIG_MONGODB_ADMINPASSWORD: admin123
@@ -28,7 +30,8 @@ services:
     build: ./backend
     restart: always
     ports:
-      - "8000:8000"
+      - "8003:8000"
+      # - "8000:8000"
     depends_on:
       - mongo
     environment:
@@ -38,7 +41,8 @@ services:
     build: ./frontend
     restart: always
     ports:
-      - "5173:5173"
+      # - "5173:5173"
+      - "5174:5173"
     depends_on:
       - backend
 
