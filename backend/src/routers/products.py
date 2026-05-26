@@ -3,7 +3,9 @@ from fastapi import APIRouter, Body, HTTPException, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import Response
 
-from database import db
+# from database import db
+from src.database import db
+
 from models.products import Product, UpdateProduct
 from datetime import datetime
 from bson import ObjectId
