@@ -1,5 +1,6 @@
 from typing import Optional
-from models.common import CommonModel
+# from models.common import CommonModel
+from src.models.common import CommonModel
 
 
 class Product(CommonModel):
