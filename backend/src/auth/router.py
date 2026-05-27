@@ -17,17 +17,19 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 
 @router.post("/login", tags=["Auth"])
 async def login(user: UserLoginSchema = Body(...)):
-    registered = await db["users"].find_one({"email": user.email })
+    
+    # registered = await db["users"].find_one({"email": user.email })
 
     if registered is None:
         return {"error": "users does not exists."}
 
-    user = user.dict()
+    # user = user.dict()
 
     if not registered.get("password"):
         return {"error": "Invalid user data in DB"}
 
-    if verify_password(user.get("password"), registered.get("password")):
+    # if verify_password(user.get("password"), registered.get("password")):
+    if verify_password(user.password, registered["password"]):
         token = create_access_token(user["email"])
         return {"access_token": token}
     else:
