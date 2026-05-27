@@ -25,8 +25,8 @@ async def login(user: UserLoginSchema = Body(...)):
     user = user.dict()
 
     if not registered.get("password"):
-    return {"error": "Invalid user data in DB"}
-    
+        return {"error": "Invalid user data in DB"}
+
     if verify_password(user.get("password"), registered.get("password")):
         token = create_access_token(user["email"])
         return {"access_token": token}
