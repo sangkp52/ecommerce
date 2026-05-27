@@ -9,12 +9,15 @@ pipeline {
         }
 
         stage('Install Python') {
+            agent {
+            docker {
+                image 'python:3.11'
+            }
+        }
             steps {
                 sh '''
-                apt-get update
-                apt-get install -y python3 python3-pip
-                python3 --version
-                pip3 --version
+                cd backend
+                pip install -r requirements.txt
                 '''
             }
         }
