@@ -45,6 +45,6 @@ services:
       - "5174:5173"
     depends_on:
       - backend
-
+      
 volumes:
   mongodb_data_container:
