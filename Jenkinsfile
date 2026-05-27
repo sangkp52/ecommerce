@@ -8,9 +8,24 @@ pipeline {
             }
         }
 
-        stage('Install Frontend') {
+        stage('Install Python') {
             steps {
-                sh 'cd frontend && npm install'
+                sh '''
+                apt-get update
+                apt-get install -y python3 python3-pip
+                python3 --version
+                pip3 --version
+                '''
+            }
+        }
+
+        stage('Install Frontend') {
+             steps {
+                sh '''
+                apt-get update
+                apt-get install -y python3 python3-pip
+                pip3 install -r backend/requirements.txt
+                '''
             }
         }
 
