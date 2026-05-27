@@ -1,48 +1,41 @@
 pipeline {
     agent any
 
-        stages {
+    stages {
 
-        stage('Install Python') {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Backend - Install & Test') {
             agent {
-            docker {
-                image 'python:3.11'
+                docker {
+                    image 'python:3.11'
+                }
             }
-        }
             steps {
                 sh '''
-                cd backend
-                pip install -r requirements.txt
+                    cd backend
+                    pip install -r requirements.txt
+                    pytest
                 '''
             }
         }
 
-       
-        stage('Install Backend') {
-            steps {
-                sh 'cd backend && pip install -r requirements.txt'
+        stage('Frontend - Install & Test') {
+            agent {
+                docker {
+                    image 'node:18'
+                }
             }
-        }
-    
-        stage('Install Frontend') {
-             steps {
+            steps {
                 sh '''
-                apt-get update
-                apt-get install -y python3 python3-pip
-                pip3 install -r backend/requirements.txt
+                    cd frontend
+                    npm install
+                    npm test -- --watchAll=false
                 '''
-            }
-        }
-
-        stage('Unit Test') {
-            steps {
-                sh 'cd backend && pytest'
-            }
-        }
-
-        stage('Frontend Test') {
-            steps {
-                sh 'cd frontend && npm test -- --watchAll=false'
             }
         }
 
@@ -52,7 +45,7 @@ pipeline {
             }
         }
 
-        stage('Deploy Staging') {
+        stage('Deploy') {
             steps {
                 sh 'docker compose up -d'
             }
