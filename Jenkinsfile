@@ -2,13 +2,6 @@ pipeline {
     agent any
 
     stages {
-
-        stage('Clone') {
-            steps {
-                git 'https://github.com/sangkp52/ecommerce.git'
-            }
-        }
-
         stage('Install Backend') {
             steps {
                 sh 'cd backend && pip install -r requirements.txt'
