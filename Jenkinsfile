@@ -1,12 +1,7 @@
 pipeline {
     agent any
 
-    stages {
-        stage('Install Backend') {
-            steps {
-                sh 'cd backend && pip install -r requirements.txt'
-            }
-        }
+        stages {
 
         stage('Install Python') {
             agent {
@@ -22,6 +17,13 @@ pipeline {
             }
         }
 
+       
+        stage('Install Backend') {
+            steps {
+                sh 'cd backend && pip install -r requirements.txt'
+            }
+        }
+    
         stage('Install Frontend') {
              steps {
                 sh '''
