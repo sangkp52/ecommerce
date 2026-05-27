@@ -23,6 +23,10 @@ async def login(user: UserLoginSchema = Body(...)):
         return {"error": "users does not exists."}
 
     user = user.dict()
+
+    if not registered.get("password"):
+    return {"error": "Invalid user data in DB"}
+    
     if verify_password(user.get("password"), registered.get("password")):
         token = create_access_token(user["email"])
         return {"access_token": token}
@@ -46,5 +50,10 @@ async def signup(user: UserSignupSchema = Body(...)):
         "created_at": datetime.utcnow(),
         "updated_at": datetime.utcnow()
     }
+    # created = await db["users"].insert_one(new_user)
+    # return jsonable_encoder(created)
     created = await db["users"].insert_one(new_user)
-    return jsonable_encoder(created)
+    return {
+        "id": str(created.inserted_id),
+        "email": user.email
+    }
