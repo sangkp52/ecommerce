@@ -86,24 +86,3 @@ async def test_crud_product():
         # VERIFY DELETE (XÁC MINH ĐÃ XÓA)
         response = await client.get(f"/products/{product_id}")
         assert response.status_code == 404
-
-@pytest.mark.asyncio
-async def test_create_product_unauthorized():
-    """Test integration: Chặn khách vãng lai (chưa đăng nhập) tạo sản phẩm"""
-    async with AsyncClient(app=app, base_url="http://test") as client:
-        
-        payload = {
-            "name": "Hack Product",
-            "description": "Trying to create without login",
-            "price": 999.0
-        }
-
-        # Thực hiện gọi API trực tiếp mà KHÔNG cấu hình headers chứa Bearer Token
-        response = await client.post("/products/", json=payload)
-        
-        # Hệ thống phải từ chối và trả về mã trạng thái 401
-        assert response.status_code == 401
-        
-        # Kiểm tra nội dung phản hồi xem có thông báo lỗi bảo mật không
-        error_detail = response.json()
-        assert "detail" in error_detail

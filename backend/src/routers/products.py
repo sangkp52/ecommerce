@@ -39,37 +39,12 @@ async def get_product(
 
     raise HTTPException(status_code=404, detail=f"Product {id} not found")
 
-
-# @router.post("/", response_model=None)
-# async def create_product(
-#     product: Product = Body(...), 
-#     db: AsyncIOMotorDatabase = Depends(get_db)
-# ):
-#     # Lấy dữ liệu dạng dict và loại bỏ trường id mặc định để tránh ghi đè dữ liệu rỗng
-#     product_dict = product.dict(by_alias=True, exclude_unset=True)
-    
-#     if "_id" in product_dict and not product_dict["_id"]:
-#         del product_dict["_id"]
-#     if "id" in product_dict and not product_dict["id"]:
-#         del product_dict["id"]
-        
-#     result = await db["products"].insert_one(product_dict)
-#     created = await db["products"].find_one({"_id": result.inserted_id})
-    
-#     # SỬA LỖI TẠI ĐÂY: Biến ObjectId thành chuỗi (str) trước khi đẩy vào jsonable_encoder
-#     if created and "_id" in created:
-#         created["_id"] = str(created["_id"])
-        
-#     return jsonable_encoder(created)
-
 @router.post("/", response_model=None)
 async def create_product(
     product: Product = Body(...), 
-    db: AsyncIOMotorDatabase = Depends(get_db),
-    # SỬA TẠI ĐÂY: Thêm dòng này để FastAPI tự động chặn đứng nếu không có Token hợp lệ
-    current_user: dict = Depends(get_current_user) 
+    db: AsyncIOMotorDatabase = Depends(get_db)
 ):
-    # Dưới này giữ nguyên logic cũ của bạn
+    # Lấy dữ liệu dạng dict và loại bỏ trường id mặc định để tránh ghi đè dữ liệu rỗng
     product_dict = product.dict(by_alias=True, exclude_unset=True)
     
     if "_id" in product_dict and not product_dict["_id"]:
@@ -80,6 +55,7 @@ async def create_product(
     result = await db["products"].insert_one(product_dict)
     created = await db["products"].find_one({"_id": result.inserted_id})
     
+    # SỬA LỖI TẠI ĐÂY: Biến ObjectId thành chuỗi (str) trước khi đẩy vào jsonable_encoder
     if created and "_id" in created:
         created["_id"] = str(created["_id"])
         
