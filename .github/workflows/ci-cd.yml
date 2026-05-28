@@ -78,10 +78,10 @@ jobs:
 
   deploy-staging:
     needs: build-test
-    if: github.ref == 'refs/heads/dev'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
       - name: Deploy to Render Staging
         run: |
-          echo "Deploy staging..."
+          curl --fail --silent --show-error \
+          -X POST "${{ secrets.RENDER_DEV_HOOK }}"
