@@ -78,10 +78,9 @@ jobs:
         
   deploy-production:
     needs: build-test
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
       - name: Deploy to Render Production
         run: |
             curl -X POST ${{ secrets.RENDER_PROD_HOOK }}
