@@ -31,12 +31,12 @@ async def test_login():
     async with AsyncClient(app=app, base_url="http://test") as client:
         response = await client.post("/auth/login", json={"email": "test@example.com", "password": "123456"})
         assert response.status_code == 200
-
+        
 @pytest.mark.asyncio
 async def test_create_get_update_delete_product():
     async with AsyncClient(app=app, base_url="http://test") as client:
 
-        # CREATE
+        # 1. CREATE (TẠO MỚI)
         payload = {
             "name": "Test Product",
             "description": "This is a test product",
@@ -44,29 +44,29 @@ async def test_create_get_update_delete_product():
         }
 
         response = await client.post("/products/", json=payload)
-
         assert response.status_code == 200
 
         product = response.json()
+        
+        # Lấy ID linh hoạt từ cả '_id' hoặc 'id' phòng trường hợp Pydantic mapping
         product_id = str(product.get("_id") or product.get("id") or "")
+        
+        # Kiểm tra xem ID có bị rỗng không, nếu rỗng sẽ in ra toàn bộ response để debug
+        assert product_id, f"Backend không trả về ID hợp lệ. Dữ liệu nhận được: {product}"
 
-        # GET ALL
+        # 2. GET ALL (LẤY TẤT CẢ)
         response = await client.get("/products/")
         assert response.status_code == 200
 
-        # GET ONE
-        assert product_id, "product_id is empty!"
+        # 3. GET ONE (LẤY MỘT SẢN PHẨM)
         response = await client.get(f"/products/{product_id}")
         assert response.status_code == 200
 
         product_data = response.json()
-        # response = await client.get(f"/products/{product_id}")
-        # assert response.status_code == 200
-        # assert response.json()["name"] == "Test Product"
-        assert isinstance(product_data, dict), f"Expected dict, got {type(product_data)}. Data: {product_data}"
+        assert isinstance(product_data, dict), f"Kỳ vọng dict nhưng nhận được {type(product_data)}"
         assert product_data["name"] == "Test Product"
 
-        # UPDATE
+        # 4. UPDATE (CẬP NHẬT)
         update_payload = {
             "price": 150.0
         }
@@ -79,12 +79,10 @@ async def test_create_get_update_delete_product():
         assert response.status_code == 200
         assert response.json()["price"] == 150.0
 
-        # DELETE
+        # 5. DELETE (XÓA)
         response = await client.delete(f"/products/{product_id}")
-
         assert response.status_code == 204
 
-        # VERIFY DELETE
+        # 6. VERIFY DELETE (XÁC MINH ĐÃ XÓA)
         response = await client.get(f"/products/{product_id}")
-
         assert response.status_code == 404
