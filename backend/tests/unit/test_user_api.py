@@ -1,7 +1,15 @@
 import pytest
-from fastapi.testclient import TestClient
+from httpx import AsyncClient
 from application import create_app
-from src.database import get_db
+from bson import ObjectId
+
+# Import hàm get_db gốc từ dự án của bạn
+from src.database import get_db 
+
+class MockInsertResult:
+    """Giả lập kết quả trả về của MongoDB khi insert thành công"""
+    def __init__(self):
+        self.inserted_id = ObjectId()
 
 class Collection:
     def __init__(self):
@@ -13,6 +21,7 @@ class Collection:
 
     async def insert_one(self, doc):
         self.data[doc["email"]] = doc
+        return MockInsertResult()
 
 class DB:
     def __init__(self):
@@ -22,42 +31,45 @@ class DB:
         if name == "users":
             return self.users
 
+# Đổi sang Async Fixture để tương thích luồng Async của Router
 @pytest.fixture
-def client():
+async def async_client():
     app = create_app()
-
     db = DB()
 
-    # override dependency
+    # Override dependency dùng DB giả lập
     app.dependency_overrides[get_db] = lambda: db
 
-    return TestClient(app)
+    # Khởi tạo AsyncClient thay vì TestClient đồng bộ
+    async with AsyncClient(app=app, base_url="http://test") as ac:
+        yield ac
 
-def test_register_user_success(client):
+@pytest.mark.asyncio
+async def test_register_user_success(async_client):
     """Test API đăng ký user thành công qua endpoint /auth/signup"""
     payload = {
         "email": "test@gmail.com",
         "password": "mysecurepassword",
-        "password_confirmation": "mysecurepassword"  # Cần khớp với UserSignupSchema của bạn
+        "password_confirmation": "mysecurepassword"
     }
     
-    # ĐỔI TẠI ĐÂY: Dùng đúng URL /auth/signup từ file router của bạn
-    response = client.post("/auth/signup", json=payload)
+    # Gọi API bằng await async_client.post
+    response = await async_client.post("/auth/signup", json=payload)
     
     assert response.status_code == 200
     assert response.json()["email"] == "test@gmail.com"
-    assert "id" in response.json()  # Đảm bảo router trả về trường id
+    assert "id" in response.json()
 
 
-def test_login_user_not_found(client):
+@pytest.mark.asyncio
+async def test_login_user_not_found(async_client):
     """Test API đăng nhập thất bại khi tài khoản chưa tồn tại"""
     payload = {
         "email": "unknown@gmail.com",
         "password": "any_password"
     }
     
-    # Dùng đúng URL /auth/login từ file router của bạn
-    response = client.post("/auth/login", json=payload)
+    response = await async_client.post("/auth/login", json=payload)
     
-    assert response.status_code == 200  # Vì router của bạn return dict lỗi trực tiếp thay vì raise HTTPException nên status_code vẫn là 200
+    assert response.status_code == 200
     assert response.json() == {"error": "user does not exist"}
