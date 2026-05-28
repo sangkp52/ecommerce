@@ -144,3 +144,41 @@ async def test_delete_product_success_logic(mock_db):
 
     # Kiểm tra xem hàm có trả về đúng mã trạng thái HTTP 204 không
     assert result.status_code == 204
+
+@pytest.mark.asyncio
+async def test_update_product_not_found_logic(mock_db):
+    """Test unit: Cập nhật thất bại khi ID sản phẩm không tồn tại trong DB"""
+    fake_id = str(ObjectId())
+    update_data = UpdateProduct(price=150.0)
+
+    # Giả lập update_one không tìm thấy bản ghi nào để sửa (modified_count = 0)
+    mock_update_result = MagicMock()
+    mock_update_result.modified_count = 0
+    mock_db["products"].update_one = AsyncMock(return_value=mock_update_result)
+    
+    # Giả lập hàm tìm kiếm cứu cánh phía sau cũng không tìm thấy sản phẩm (None)
+    mock_db["products"].find_one = AsyncMock(return_value=None)
+
+    # Kiểm tra xem hàm có ném ra lỗi HTTPException 404 đúng hiệu lệnh không
+    with pytest.raises(HTTPException) as exc_info:
+        await update_product(id=fake_id, product=update_data, db=mock_db)
+
+    assert exc_info.value.status_code == 404
+    assert f"Product {fake_id} not found" in exc_info.value.detail
+
+@pytest.mark.asyncio
+async def test_delete_product_not_found_logic(mock_db):
+    """Test unit: Xóa thất bại khi ID sản phẩm không tồn tại trong DB"""
+    fake_id = str(ObjectId())
+    
+    # Giả lập delete_one trả về kết quả xóa được 0 bản ghi (deleted_count = 0)
+    mock_delete_result = MagicMock()
+    mock_delete_result.deleted_count = 0
+    mock_db["products"].delete_one = AsyncMock(return_value=mock_delete_result)
+
+    # Kiểm tra xem hàm có ném ra lỗi HTTPException 404 không
+    with pytest.raises(HTTPException) as exc_info:
+        await delete_product(id=fake_id, db=mock_db)
+
+    assert exc_info.value.status_code == 404
+    assert f"Product {fake_id} not found" in exc_info.value.detail
