@@ -33,7 +33,7 @@ jobs:
       with:
         args: >
           -Dsonar.projectKey=ecommerce
-          -Dsonar.organization=YOUR_ORG_NAME
+          -Dsonar.organization=sang
           -Dsonar.sources=backend
 
 
