@@ -31,7 +31,7 @@ async def get_product(
     db: AsyncIOMotorDatabase = Depends(get_db)
 ):
     if (product := await db["products"].find_one({"_id": ObjectId(id)})) is not None:
-    return product
+        return product
 
     raise HTTPException(status_code=404, detail=f"Product {id} not found")
 
