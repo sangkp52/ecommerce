@@ -33,16 +33,15 @@ class DB:
 
 # Đổi sang Async Fixture để tương thích luồng Async của Router
 @pytest.fixture
-async def async_client():
+def async_client():
     app = create_app()
     db = DB()
 
-    # Override dependency dùng DB giả lập
+    # Override dependency dùng DB giả lập của bạn
     app.dependency_overrides[get_db] = lambda: db
 
-    # Khởi tạo AsyncClient thay vì TestClient đồng bộ
-    async with AsyncClient(app=app, base_url="http://test") as ac:
-        yield ac
+    # Trả về trực tiếp client (FastAPI AsyncClient hỗ trợ tạo trực tiếp mà không cần context manager trong test)
+    return AsyncClient(app=app, base_url="http://test")
 
 @pytest.mark.asyncio
 async def test_register_user_success(async_client):
