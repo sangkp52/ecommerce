@@ -6,11 +6,24 @@ name: CI Test
 on:
   push:
     branches: ["main"]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   build-test:
     runs-on: ubuntu-latest
 
+    services:
+     mongo:
+        image: mongo:6.0
+        ports:
+          - 27018:27017   # port host:port container
+        options: >-
+          --bind_ip_all
+
+    env:
+      MONGO_URI: mongodb://localhost:27018
+    
     steps:
     - name: Checkout code
       uses: actions/checkout@v5
