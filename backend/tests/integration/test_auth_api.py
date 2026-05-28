@@ -55,9 +55,16 @@ async def test_create_get_update_delete_product():
         assert response.status_code == 200
 
         # GET ONE
+        assert product_id, "product_id is empty!"
         response = await client.get(f"/products/{product_id}")
         assert response.status_code == 200
-        assert response.json()["name"] == "Test Product"
+
+        product_data = response.json()
+        # response = await client.get(f"/products/{product_id}")
+        # assert response.status_code == 200
+        # assert response.json()["name"] == "Test Product"
+        assert isinstance(product_data, dict), f"Expected dict, got {type(product_data)}. Data: {product_data}"
+        assert product_data["name"] == "Test Product"
 
         # UPDATE
         update_payload = {
