@@ -130,9 +130,10 @@ async def create_product(
     product: Product = Body(...), 
     db: AsyncIOMotorDatabase = Depends(get_db)
 ):
-    product_dict = jsonable_encoder(product)
+    # Lấy dữ liệu dạng dict loại bỏ hoàn toàn các trường chưa thiết lập (như id rỗng)
+    product_dict = product.model_dump(by_alias=True, exclude_unset=True) 
     
-    # Loại bỏ ID cũ nếu có để MongoDB tự sinh ObjectId mới
+    # Nếu có trường _id nhưng giá trị rỗng/None, xóa đi để MongoDB tự sinh ObjectId mới
     if "_id" in product_dict and not product_dict["_id"]:
         del product_dict["_id"]
         
