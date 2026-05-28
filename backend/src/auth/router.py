@@ -9,6 +9,7 @@ from datetime import datetime
 
 from src.database import db
 from src.models.users import User
+from fastapi import APIRouter, Depends
 from src.auth.utils import hash_password, verify_password, create_access_token
 
 
