@@ -11,28 +11,6 @@ from src.auth.utils import hash_password, verify_password, create_access_token
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
-
-# @router.post("/login", tags=["Auth"])
-# async def login(user: UserLoginSchema = Body(...)):
-# @router.post("/login", tags=["Auth"])
-# async def login(user: UserLoginSchema, db: AsyncIOMotorDatabase = Depends(get_db)):
-#     registered = await db["users"].find_one({"email": user.email})
-    
-#     if registered is None:
-#         return {"error": "users does not exists."}
-
-#     # user = user.dict()
-
-#     if not registered.get("password"):
-#         raise HTTPException(status_code=401, detail="Invalid user data in DB")
-
-#     # if verify_password(user.get("password"), registered.get("password")):
-#     if verify_password(user.password, registered["password"]):
-#         token = create_access_token(user["email"])
-#         return {"access_token": token}
-#     else:
-#         return {"error", "password is incorrect."}
-
 from fastapi import Depends
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
