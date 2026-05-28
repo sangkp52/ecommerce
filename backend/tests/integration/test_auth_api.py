@@ -1,15 +1,19 @@
+import pytest
 from fastapi.testclient import TestClient
-from application import create_app # file chứa FastAPI app
+from application import create_app
 
-app = create_app()
-client = TestClient(app)
+@pytest.fixture
+def client():
+    app = create_app()
+    return TestClient(app)
 
-def test_root():
+
+def test_root(client):
     response = client.get("/")
     assert response.status_code == 200
 
 
-def test_signup():
+def test_signup(client):
     response = client.post("/auth/signup", json={
         "email": "test@example.com",
         "password": "123456",
@@ -19,7 +23,7 @@ def test_signup():
     assert "email" in response.json()
 
 
-def test_login():
+def test_login(client):
     response = client.post("/auth/login", json={
         "email": "test@example.com",
         "password": "123456"
