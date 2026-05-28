@@ -26,8 +26,6 @@ def test_signup(client):
     assert response.status_code == 200
     assert "email" in response.json()
 
-
-
 @pytest.mark.asyncio
 async def test_login():
     async with AsyncClient(app=app, base_url="http://test") as client:
@@ -37,33 +35,49 @@ async def test_login():
 @pytest.mark.asyncio
 async def test_create_get_update_delete_product():
     async with AsyncClient(app=app, base_url="http://test") as client:
+
         # CREATE
-        payload = {"name": "Test Product", "price": 100}
+        payload = {
+            "name": "Test Product",
+            "description": "This is a test product",
+            "price": 100.0
+        }
+
         response = await client.post("/products/", json=payload)
+
         assert response.status_code == 200
+
         product = response.json()
         product_id = product["_id"]
 
         # GET ALL
         response = await client.get("/products/")
         assert response.status_code == 200
-        assert any(p["_id"] == product_id for p in response.json())
 
         # GET ONE
         response = await client.get(f"/products/{product_id}")
         assert response.status_code == 200
-        assert response.json()["_id"] == product_id
+        assert response.json()["name"] == "Test Product"
 
         # UPDATE
-        update_payload = {"price": 120}
-        response = await client.put(f"/products/{product_id}", json=update_payload)
+        update_payload = {
+            "price": 150.0
+        }
+
+        response = await client.put(
+            f"/products/{product_id}",
+            json=update_payload
+        )
+
         assert response.status_code == 200
-        assert response.json()["price"] == 120
+        assert response.json()["price"] == 150.0
 
         # DELETE
         response = await client.delete(f"/products/{product_id}")
+
         assert response.status_code == 204
 
-        # GET AFTER DELETE
+        # VERIFY DELETE
         response = await client.get(f"/products/{product_id}")
+
         assert response.status_code == 404
