@@ -1,6 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 from application import create_app
+from src.database import get_db
 
 class Collection:
     def __init__(self):
