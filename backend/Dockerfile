@@ -2,10 +2,8 @@ FROM python:3.11
 
 WORKDIR /app
 
-COPY . .
-# COPY backend/requirements.txt .
-
-RUN pip install --upgrade pip
+# COPY . .
+COPY backend/requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
