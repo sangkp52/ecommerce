@@ -20,6 +20,10 @@ async def get_products(
     db: AsyncIOMotorDatabase = Depends(get_db)
 ):
     products = await db["products"].find().to_list(100)
+    # Tránh lỗi mã hóa ObjectId bằng cách chuyển đổi nó thành chuỗi thủ công cho từng sản phẩm
+    for p in products:
+        if "_id" in p:
+            p["_id"] = str(p["_id"])
     return products
 
 
@@ -29,6 +33,8 @@ async def get_product(
     db: AsyncIOMotorDatabase = Depends(get_db)
 ):
     if (product := await db["products"].find_one({"_id": ObjectId(id)})) is not None:
+        if "_id" in product:
+            product["_id"] = str(product["_id"])
         return product
 
     raise HTTPException(status_code=404, detail=f"Product {id} not found")
@@ -39,10 +45,9 @@ async def create_product(
     product: Product = Body(...), 
     db: AsyncIOMotorDatabase = Depends(get_db)
 ):
-    # SỬA LỖI: Sử dụng .dict() thay vì .model_dump() cho Pydantic V1
+    # Lấy dữ liệu dạng dict và loại bỏ trường id mặc định để tránh ghi đè dữ liệu rỗng
     product_dict = product.dict(by_alias=True, exclude_unset=True)
     
-    # Loại bỏ trường _id nếu nó mang giá trị rỗng/None để MongoDB tự tạo ObjectId mới hợp lệ
     if "_id" in product_dict and not product_dict["_id"]:
         del product_dict["_id"]
     if "id" in product_dict and not product_dict["id"]:
@@ -50,6 +55,11 @@ async def create_product(
         
     result = await db["products"].insert_one(product_dict)
     created = await db["products"].find_one({"_id": result.inserted_id})
+    
+    # SỬA LỖI TẠI ĐÂY: Biến ObjectId thành chuỗi (str) trước khi đẩy vào jsonable_encoder
+    if created and "_id" in created:
+        created["_id"] = str(created["_id"])
+        
     return jsonable_encoder(created)
 
 
@@ -59,7 +69,6 @@ async def update_product(
     product: UpdateProduct = Body(...),
     db: AsyncIOMotorDatabase = Depends(get_db)
 ):
-    # Sử dụng .dict() tương thích Pydantic V1
     product_data = {
         k: v for k, v in product.dict().items()
         if v is not None
@@ -75,6 +84,8 @@ async def update_product(
             updated_product = await db["products"].find_one({
                 "_id": ObjectId(id)
             })
+            if updated_product and "_id" in updated_product:
+                updated_product["_id"] = str(updated_product["_id"])
             return jsonable_encoder(updated_product)
 
     existing_product = await db["products"].find_one({
@@ -82,6 +93,8 @@ async def update_product(
     })
 
     if existing_product is not None:
+        if "_id" in existing_product:
+            existing_product["_id"] = str(existing_product["_id"])
         return jsonable_encoder(existing_product)
 
     raise HTTPException(status_code=404, detail=f"Product {id} not found")
