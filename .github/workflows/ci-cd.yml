@@ -75,3 +75,13 @@ jobs:
       run: |
         cd backend
         pytest tests/unit tests/integration --cov=src --cov-report=term-missing -v
+
+  deploy-staging:
+    needs: test
+    if: github.ref == 'refs/heads/dev'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Deploy to Render Staging
+        run: |
+          echo "Deploy staging..."
