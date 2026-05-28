@@ -33,10 +33,10 @@ async def test_login():
         assert response.status_code == 200
         
 @pytest.mark.asyncio
-async def test_create_get_update_delete_product():
+async def test_crud_product():
     async with AsyncClient(app=app, base_url="http://test") as client:
 
-        # 1. CREATE (TẠO MỚI)
+        # CREATE (TẠO MỚI)
         payload = {
             "name": "Test Product",
             "description": "This is a test product",
@@ -54,11 +54,11 @@ async def test_create_get_update_delete_product():
         # Kiểm tra xem ID có bị rỗng không, nếu rỗng sẽ in ra toàn bộ response để debug
         assert product_id, f"Backend không trả về ID hợp lệ. Dữ liệu nhận được: {product}"
 
-        # 2. GET ALL (LẤY TẤT CẢ)
+        # GET ALL (LẤY TẤT CẢ)
         response = await client.get("/products/")
         assert response.status_code == 200
 
-        # 3. GET ONE (LẤY MỘT SẢN PHẨM)
+        # GET ONE (LẤY MỘT SẢN PHẨM)
         response = await client.get(f"/products/{product_id}")
         assert response.status_code == 200
 
@@ -66,7 +66,7 @@ async def test_create_get_update_delete_product():
         assert isinstance(product_data, dict), f"Kỳ vọng dict nhưng nhận được {type(product_data)}"
         assert product_data["name"] == "Test Product"
 
-        # 4. UPDATE (CẬP NHẬT)
+        # UPDATE (CẬP NHẬT)
         update_payload = {
             "price": 150.0
         }
@@ -79,10 +79,10 @@ async def test_create_get_update_delete_product():
         assert response.status_code == 200
         assert response.json()["price"] == 150.0
 
-        # 5. DELETE (XÓA)
+        # DELETE (XÓA)
         response = await client.delete(f"/products/{product_id}")
         assert response.status_code == 204
 
-        # 6. VERIFY DELETE (XÁC MINH ĐÃ XÓA)
+        # VERIFY DELETE (XÁC MINH ĐÃ XÓA)
         response = await client.get(f"/products/{product_id}")
         assert response.status_code == 404

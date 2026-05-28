@@ -4,13 +4,11 @@ def test_password_match():
 
     assert password == confirmation
 
-
 def test_password_mismatch():
     password = "123456"
     confirmation = "654321"
 
     assert password != confirmation
-
 
 def test_email_contains_at_symbol():
     email = "test@example.com"
