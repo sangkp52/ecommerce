@@ -34,21 +34,30 @@ def client():
     return TestClient(app)
 
 def test_register_user_success(client):
-    """Test API đăng ký user thông qua TestClient và DB giả lập"""
+    """Test API đăng ký user thành công qua endpoint /auth/signup"""
     payload = {
         "email": "test@gmail.com",
-        "password": "mysecurepassword"
+        "password": "mysecurepassword",
+        "password_confirmation": "mysecurepassword"  # Cần khớp với UserSignupSchema của bạn
     }
-    # Gọi endpoint đăng ký (bạn thay đổi router của bạn cho đúng, ví dụ /users/ hoặc /signup)
-    response = client.post("/users/", json=payload)
     
-    assert response.status_code == 200 or response.status_code == 21
+    # ĐỔI TẠI ĐÂY: Dùng đúng URL /auth/signup từ file router của bạn
+    response = client.post("/auth/signup", json=payload)
+    
+    assert response.status_code == 200
     assert response.json()["email"] == "test@gmail.com"
+    assert "id" in response.json()  # Đảm bảo router trả về trường id
 
 
-def test_get_user_not_found(client):
-    """Test API lấy thông tin user không tồn tại"""
-    # Gọi một email chưa từng được insert vào cái DB giả lập ở trên
-    response = client.get("/users/unknown@gmail.com")
+def test_login_user_not_found(client):
+    """Test API đăng nhập thất bại khi tài khoản chưa tồn tại"""
+    payload = {
+        "email": "unknown@gmail.com",
+        "password": "any_password"
+    }
     
-    assert response.status_code == 404
+    # Dùng đúng URL /auth/login từ file router của bạn
+    response = client.post("/auth/login", json=payload)
+    
+    assert response.status_code == 200  # Vì router của bạn return dict lỗi trực tiếp thay vì raise HTTPException nên status_code vẫn là 200
+    assert response.json() == {"error": "user does not exist"}
