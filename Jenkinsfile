@@ -3,7 +3,7 @@ pipeline {
 
     // Kích hoạt công cụ Docker CLI đã cấu hình ở Bước 1 vào hệ thống
     tools {
-        docker 'docker'
+        dockerTool 'docker' 
     }
 
     stages {
