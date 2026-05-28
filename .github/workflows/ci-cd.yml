@@ -30,6 +30,11 @@ jobs:
       uses: sonarsource/sonarcloud-github-action@v2
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      with:
+        args: >
+          -Dsonar.projectKey=ecommerce
+          -Dsonar.organization=YOUR_ORG_NAME
+          -Dsonar.sources=backend
 
 
     - name: Run tests
