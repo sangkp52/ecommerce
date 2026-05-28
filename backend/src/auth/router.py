@@ -49,7 +49,9 @@ async def login(
         return {"error": "user does not exist"}
 
     if verify_password(user.password, registered["password"]):
-        token = create_access_token(user.email)
+        token = create_access_token({
+            "sub": user.email
+        })
 
         return {
             "access_token": token
