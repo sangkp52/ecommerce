@@ -31,25 +31,17 @@ async def get_product(
     db: AsyncIOMotorDatabase = Depends(get_db)
 ):
     if (product := await db["products"].find_one({"_id": ObjectId(id)})) is not None:
-        return product
+    return product
 
     raise HTTPException(status_code=404, detail=f"Product {id} not found")
 
 
 @router.post("/", response_model=Product)
-async def create_product(
-    product: Product = Body(...),
-    db: AsyncIOMotorDatabase = Depends(get_db)
-):
+async def create_product(product: Product = Body(...), db: AsyncIOMotorDatabase = Depends(get_db)):
     product = jsonable_encoder(product)
-
     result = await db["products"].insert_one(product)
-
-    created = await db["products"].find_one({
-        "_id": result.inserted_id
-    })
-
-    return created
+    created = await db["products"].find_one({"_id": result.inserted_id})
+    return jsonable_encoder(created)
 
 
 @router.put("/{id}")

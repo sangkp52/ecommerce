@@ -21,7 +21,8 @@ class PyObjectId(ObjectId):
 
 
 class CommonModel(BaseModel):
-    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    # id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    id: str = Field(default_factory=str, alias="_id")
     created_at: Optional[datetime]
     updated_at: Optional[datetime]
 
