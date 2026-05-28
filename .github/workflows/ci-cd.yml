@@ -26,15 +26,12 @@ jobs:
         pip install pytest
         if [ -f backend/requirements.txt ]; then pip install -r backend/requirements.txt; fi
 
+    - name: Install SonarScanner
+      uses: sonarsource/sonarcloud-github-action@v2
+
+      
     - name: Run tests
       run: |
         cd backend
         pytest -v
 
-    - name: Install SonarScanner
-      run: |
-        sudo apt-get update
-        sudo apt-get install unzip
-        wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
-        unzip sonar-scanner-cli-*.zip
-        echo "$PWD/sonar-scanner-*/bin" >> $GITHUB_PATH
