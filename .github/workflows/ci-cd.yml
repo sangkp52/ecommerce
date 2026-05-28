@@ -32,7 +32,7 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       with:
         args: >
-          -Dsonar.projectKey=ecommerce
+          -Dsonar.projectKey=sangkp52_ecommerce
           -Dsonar.organization=sangkp52
           -Dsonar.sources=backend
 
