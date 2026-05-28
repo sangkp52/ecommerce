@@ -39,7 +39,7 @@ async def login(user: UserLoginSchema = Body(...)):
 @router.post("/signup", tags=["Auth"])
 # async def signup(user: UserSignupSchema = Body(...)):
 #     already_exists = await db["users"].find_one({"email": user.email })
-async def signup(user: UserCreate, db: AsyncIOMotorDatabase = Depends(get_db)):
+async def signup(user: UserSignupSchema, db: AsyncIOMotorDatabase = Depends(get_db)):
     already_exists = await db["users"].find_one({"email": user.email})
 
     if already_exists:
