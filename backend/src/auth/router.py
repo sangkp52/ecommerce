@@ -1,11 +1,8 @@
 from fastapi import APIRouter, Body
 from fastapi.encoders import jsonable_encoder
-# from auth.models import UserLoginSchema, UserSignupSchema
 from src.auth.models import UserLoginSchema, UserSignupSchema
-# from models.users import User
+from fastapi import HTTPException
 from datetime import datetime
-# from database import db
-# from auth.utils import hash_password, verify_password, create_access_token
 
 from src.database import get_db, db
 from motor.motor_asyncio import AsyncIOMotorDatabase
@@ -17,18 +14,19 @@ from src.auth.utils import hash_password, verify_password, create_access_token
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
+# @router.post("/login", tags=["Auth"])
+# async def login(user: UserLoginSchema = Body(...)):
 @router.post("/login", tags=["Auth"])
-async def login(user: UserLoginSchema = Body(...)):
+async def login(user: UserLoginSchema, db: AsyncIOMotorDatabase = Depends(get_db)):
+    registered = await db["users"].find_one({"email": user.email})
     
-    registered = await db["users"].find_one({"email": user.email })
-
     if registered is None:
         return {"error": "users does not exists."}
 
     # user = user.dict()
 
     if not registered.get("password"):
-        return {"error": "Invalid user data in DB"}
+        raise HTTPException(status_code=401, detail="Invalid user data in DB")
 
     # if verify_password(user.get("password"), registered.get("password")):
     if verify_password(user.password, registered["password"]):
