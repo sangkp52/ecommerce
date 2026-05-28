@@ -15,3 +15,6 @@ uvicorn==0.20.0
 passlib[bcrypt]
 email-validator
 python-jose[cryptography]
+pytest
+pytest-asyncio
+httpx

@@ -15,11 +15,3 @@ def create_app() -> FastAPI:
     app.include_router(api_router)
     app.include_router(auth_router)
     return app
-# from fastapi import FastAPI
-# from routers import api_router
-# from auth.router import router as auth_router
-
-# app = FastAPI()
-
-# app.include_router(api_router)
-# app.include_router(auth_router)

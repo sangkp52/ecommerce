@@ -18,7 +18,7 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 @router.post("/login", tags=["Auth"])
 async def login(user: UserLoginSchema = Body(...)):
     
-    # registered = await db["users"].find_one({"email": user.email })
+    registered = await db["users"].find_one({"email": user.email })
 
     if registered is None:
         return {"error": "users does not exists."}
