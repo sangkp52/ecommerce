@@ -1,23 +1,33 @@
 import pytest
 from fastapi.testclient import TestClient
-from application import create_app # hoặc create_app
+from application import create_app
+
+class Collection:
+    def __init__(self):
+        self.data = {}
+
+    async def find_one(self, query):
+        email = query.get("email")
+        return self.data.get(email)
+
+    async def insert_one(self, doc):
+        self.data[doc["email"]] = doc
 
 class DB:
     def __init__(self):
-        self.users = []
+        self.users = Collection()
 
-    async def find_one(self, query):
-        for u in self.users:
-            if u["email"] == query["email"]:
-                return u
-        return None
-
-    async def insert_one(self, data):
-        self.users.append(data)
-        return data
+    def __getitem__(self, name):
+        if name == "users":
+            return self.users
 
 @pytest.fixture
 def client():
-    app.dependency_overrides[get_db] = lambda: FakeDB()
-    with TestClient(app) as c:
-        yield c
+    app = create_app()
+
+    db = DB()
+
+    # override dependency
+    app.dependency_overrides[get_db] = lambda: db
+
+    return TestClient(app)
