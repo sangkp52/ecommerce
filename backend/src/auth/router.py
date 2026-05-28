@@ -1,13 +1,11 @@
-from fastapi import APIRouter, Body
+from fastapi import APIRouter, Body, Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
 from src.auth.models import UserLoginSchema, UserSignupSchema
-from fastapi import HTTPException
 from datetime import datetime
 
-from src.database import get_db, db
+from src.database import get_db
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from src.models.users import User
-from fastapi import APIRouter, Depends
 from src.auth.utils import hash_password, verify_password, create_access_token
 
 
@@ -43,21 +41,31 @@ async def login(
     user: UserLoginSchema = Body(...),
     db: AsyncIOMotorDatabase = Depends(get_db)
 ):
-    registered = await db["users"].find_one({"email": user.email})
+    registered = await db["users"].find_one({
+        "email": user.email
+    })
 
-    if not registered:
-        return {"error": "user does not exists"}
+    if registered is None:
+        return {"error": "user does not exist"}
 
     if verify_password(user.password, registered["password"]):
-        token = create_access_token(registered["email"])
-        return {"access_token": token}
+        token = create_access_token(user.email)
 
-    return {"error": "password is incorrect"}
+        return {
+            "access_token": token
+        }
+
+    return {
+        "error": "password incorrect"
+    }
 
 @router.post("/signup", tags=["Auth"])
 # async def signup(user: UserSignupSchema = Body(...)):
 #     already_exists = await db["users"].find_one({"email": user.email })
-async def signup(user: UserSignupSchema, db: AsyncIOMotorDatabase = Depends(get_db)):
+async def signup(
+    user: UserSignupSchema,
+    db: AsyncIOMotorDatabase = Depends(get_db)
+):
     already_exists = await db["users"].find_one({"email": user.email})
 
     if already_exists:

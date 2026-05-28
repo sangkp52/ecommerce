@@ -1,4 +1,3 @@
-# src/database/__init__.py
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 
