@@ -8,6 +8,7 @@ from datetime import datetime
 # from auth.utils import hash_password, verify_password, create_access_token
 
 from src.database import get_db, db
+from motor.motor_asyncio import AsyncIOMotorDatabase
 from src.models.users import User
 from fastapi import APIRouter, Depends
 from src.auth.utils import hash_password, verify_password, create_access_token
