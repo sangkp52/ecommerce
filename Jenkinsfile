@@ -1,7 +1,6 @@
 pipeline {
     agent any
 
-    // Kích hoạt công cụ Docker CLI đã cấu hình ở Bước 1 vào hệ thống
     tools {
         dockerTool 'docker' 
     }
