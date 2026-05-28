@@ -52,20 +52,26 @@ jobs:
     #       -Dsonar.organization=sangkp52
     #       -Dsonar.sources=backend
 
+    # - name: Run unit tests
+    #   run: |
+    #     cd backend
+    #     pytest tests/unit -v
 
-    - name: Run unit tests
-      run: |
-        cd backend
-        pytest tests/unit -v
+    # - name: Run integration tests
+    #   run: |
+    #     cd backend
+    #     pytest tests/integration -v
 
-    - name: Run integration tests
-      run: |
-        cd backend
-        pytest tests/integration -v
+    # - name: Run tests with coverage
+    #   env:
+    #     PYTHONPATH: .
+    #   run: |
+    #     cd backend
+    #     python -m pytest --cov=src --cov-report=term-missing
 
-    - name: Run tests with coverage
+    - name: Run all tests with coverage
       env:
         PYTHONPATH: .
       run: |
         cd backend
-        python -m pytest --cov=src --cov-report=term-missing
+        pytest tests/unit tests/integration --cov=src --cov-report=term-missing -v
