@@ -16,24 +16,43 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 
 # @router.post("/login", tags=["Auth"])
 # async def login(user: UserLoginSchema = Body(...)):
-@router.post("/login", tags=["Auth"])
-async def login(user: UserLoginSchema, db: AsyncIOMotorDatabase = Depends(get_db)):
-    registered = await db["users"].find_one({"email": user.email})
+# @router.post("/login", tags=["Auth"])
+# async def login(user: UserLoginSchema, db: AsyncIOMotorDatabase = Depends(get_db)):
+#     registered = await db["users"].find_one({"email": user.email})
     
-    if registered is None:
-        return {"error": "users does not exists."}
+#     if registered is None:
+#         return {"error": "users does not exists."}
 
-    # user = user.dict()
+#     # user = user.dict()
 
-    if not registered.get("password"):
-        raise HTTPException(status_code=401, detail="Invalid user data in DB")
+#     if not registered.get("password"):
+#         raise HTTPException(status_code=401, detail="Invalid user data in DB")
 
-    # if verify_password(user.get("password"), registered.get("password")):
+#     # if verify_password(user.get("password"), registered.get("password")):
+#     if verify_password(user.password, registered["password"]):
+#         token = create_access_token(user["email"])
+#         return {"access_token": token}
+#     else:
+#         return {"error", "password is incorrect."}
+
+from fastapi import Depends
+from motor.motor_asyncio import AsyncIOMotorDatabase
+
+@router.post("/login")
+async def login(
+    user: UserLoginSchema = Body(...),
+    db: AsyncIOMotorDatabase = Depends(get_db)
+):
+    registered = await db["users"].find_one({"email": user.email})
+
+    if not registered:
+        return {"error": "user does not exists"}
+
     if verify_password(user.password, registered["password"]):
-        token = create_access_token(user["email"])
+        token = create_access_token(registered["email"])
         return {"access_token": token}
-    else:
-        return {"error", "password is incorrect."}
+
+    return {"error": "password is incorrect"}
 
 @router.post("/signup", tags=["Auth"])
 # async def signup(user: UserSignupSchema = Body(...)):
