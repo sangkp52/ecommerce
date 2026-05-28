@@ -18,6 +18,8 @@ def test_root(client):
 
 
 def test_signup(client):
+    random_email = f"test_{datetime.utcnow().timestamp()}@example.com"
+    
     response = client.post("/auth/signup", json={
         "email": "test@example.com",
         "password": "123456",
