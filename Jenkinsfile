@@ -1,9 +1,9 @@
 pipeline {
     agent any
 
-    // Định nghĩa các công cụ cần dùng trong toàn bộ Pipeline
+    // Kích hoạt công cụ Docker CLI đã cấu hình ở Bước 1 vào hệ thống
     tools {
-        nodejs 'node18' // Gọi công cụ NodeJS đã cấu hình trong Global Tool
+        docker 'docker'
     }
 
     stages {
@@ -14,8 +14,12 @@ pipeline {
         }
 
         stage('Backend - Install & Test') {
+            agent {
+                docker {
+                    image 'python:3.11'
+                }
+            }
             steps {
-                // Sử dụng chính môi trường của Jenkins để chạy venv (Không cần Docker agent)
                 sh '''
                     cd backend
                     python3 -m venv venv
@@ -29,8 +33,12 @@ pipeline {
         }
 
         stage('Frontend - Install & Test') {
+            agent {
+                docker {
+                    image 'node:18'
+                }
+            }
             steps {
-                // Chạy npm trực tiếp thông qua công cụ NodeJS Tool ở trên
                 sh '''
                     cd frontend
                     npm install
@@ -41,14 +49,12 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                // Build cụm sản phẩm
                 sh 'docker compose build'
             }
         }
 
         stage('Deploy') {
             steps {
-                // Deploy dự án lên các cổng mong muốn
                 sh 'docker compose up -d'
             }
         }
