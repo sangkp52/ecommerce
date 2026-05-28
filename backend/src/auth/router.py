@@ -36,8 +36,10 @@ async def login(user: UserLoginSchema = Body(...)):
         return {"error", "password is incorrect."}
 
 @router.post("/signup", tags=["Auth"])
-async def signup(user: UserSignupSchema = Body(...)):
-    already_exists = await db["users"].find_one({"email": user.email })
+# async def signup(user: UserSignupSchema = Body(...)):
+#     already_exists = await db["users"].find_one({"email": user.email })
+async def signup(user: UserCreate, db: AsyncIOMotorDatabase = Depends(get_db)):
+    already_exists = await db["users"].find_one({"email": user.email})
 
     if already_exists:
         return { "error": "User already exists" }
