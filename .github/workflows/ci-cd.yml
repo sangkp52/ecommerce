@@ -28,8 +28,10 @@ jobs:
 
     - name: Install SonarScanner
       uses: sonarsource/sonarcloud-github-action@v2
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      
+
     - name: Run tests
       run: |
         cd backend
