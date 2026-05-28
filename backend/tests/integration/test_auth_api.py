@@ -48,7 +48,7 @@ async def test_create_get_update_delete_product():
         assert response.status_code == 200
 
         product = response.json()
-        product_id = product["_id"]
+        product_id = str(product["_id"])
 
         # GET ALL
         response = await client.get("/products/")
