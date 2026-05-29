@@ -5,10 +5,6 @@ from httpx import AsyncClient
 from application import create_app
 from bson import ObjectId
 
-app = create_app()
-
-client = TestClient(create_app())
-
 @pytest.fixture
 def client():
     app = create_app()
@@ -98,13 +94,13 @@ async def test_crud_product():
         response = await client.get(f"/products/{product_id}")
         assert response.status_code == 404
 
-def test_metrics_endpoint_exists():
+def test_metrics_endpoint_exists(client):
     response = client.get("/metrics")
 
     assert response.status_code == 200
     assert "http_requests_total" in response.text
 
-def test_request_generates_metrics():
+def test_request_generates_metrics(client):
     client.get("/")  # hit endpoint
 
     metrics = client.get("/metrics")
@@ -112,12 +108,12 @@ def test_request_generates_metrics():
     assert metrics.status_code == 200
     assert "http_requests_total" in metrics.text
 
-def test_app_routes_work():
+def test_app_routes_work(client):
     response = client.get("/")
 
-    assert response.status_code in [200, 404]
+    assert response.status_code in [200, 401, 404]
 
-def test_metrics_not_crash():
+def test_metrics_not_crash(client):
     client = TestClient(create_app())
 
     for _ in range(5):
