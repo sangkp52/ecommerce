@@ -52,6 +52,14 @@ jobs:
     #       -Dsonar.organization=sangkp52
     #       -Dsonar.sources=backend
 
+    - name: SonarCloud Scan
+      uses: SonarSource/sonarcloud-github-action@v2
+      with:
+        args: >
+          -Dsonar.projectKey=sangkp52_ecommerce
+          -Dsonar.organization=sangkp52
+          -Dsonar.branch.name=dev
+
     # - name: Run unit tests
     #   run: |
     #     cd backend
