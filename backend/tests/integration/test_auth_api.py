@@ -9,7 +9,6 @@ app = create_app()
 
 @pytest.fixture
 def client():
-    app = create_app()
     return TestClient(app)
 
 
@@ -45,7 +44,7 @@ async def test_login():
 async def test_crud_product():
     async with AsyncClient(app=app, base_url="http://test") as client:
 
-        # CREATE (TẠO MỚI)
+        # CREATE
         payload = {
             "name": "Test Product",
             "description": "This is a test product",
@@ -63,11 +62,11 @@ async def test_crud_product():
         # Kiểm tra xem ID có bị rỗng không, nếu rỗng sẽ in ra toàn bộ response để debug
         assert product_id, f"Backend không trả về ID hợp lệ. Dữ liệu nhận được: {product}"
 
-        # GET ALL (LẤY TẤT CẢ)
+        # GET ALL
         response = await client.get("/products/")
         assert response.status_code == 200
 
-        # GET ONE (LẤY MỘT SẢN PHẨM)
+        # GET ONE
         response = await client.get(f"/products/{product_id}")
         assert response.status_code == 200
 
@@ -75,7 +74,7 @@ async def test_crud_product():
         assert isinstance(product_data, dict), f"Kỳ vọng dict nhưng nhận được {type(product_data)}"
         assert product_data["name"] == "Test Product"
 
-        # UPDATE (CẬP NHẬT)
+        # UPDATE 
         update_payload = {
             "price": 150.0
         }
@@ -88,10 +87,40 @@ async def test_crud_product():
         assert response.status_code == 200
         assert response.json()["price"] == 150.0
 
-        # DELETE (XÓA)
+        # DELETE
         response = await client.delete(f"/products/{product_id}")
         assert response.status_code == 204
 
-        # VERIFY DELETE (XÁC MINH ĐÃ XÓA)
+        # VERIFY DELETE
         response = await client.get(f"/products/{product_id}")
         assert response.status_code == 404
+
+
+def test_metrics_endpoint_exists(client):
+    response = client.get("/metrics")
+
+    assert response.status_code == 200
+    assert "http_requests_total" in response.text
+
+def test_request_generates_metrics(client):
+    client.get("/")  # hit endpoint
+
+    metrics = client.get("/metrics")
+
+    assert metrics.status_code == 200
+    assert "http_requests_total" in metrics.text
+
+def test_app_routes_work(client):
+    response = client.get("/")
+
+    assert response.status_code in [200, 401, 404]
+
+def test_metrics_not_crash(client):
+    client = TestClient(create_app())
+
+    for _ in range(5):
+        client.get("/")
+
+    res = client.get("/metrics")
+
+    assert res.status_code == 200
