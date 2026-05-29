@@ -75,6 +75,19 @@ jobs:
       run: |
         cd backend
         pytest tests/unit tests/integration --cov=src --cov-report=term-missing -v
+
+    
+    - name: SonarCloud Scan
+      uses: SonarSource/sonarcloud-github-action@v2
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        args: >
+          -Dsonar.projectKey=sangkp52_ecommerce
+          -Dsonar.organization=sangkp52
+          -Dsonar.branch.name=main
+
         
   deploy-production:
     needs: build-test
