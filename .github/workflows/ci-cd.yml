@@ -77,6 +77,7 @@ jobs:
           pytest --cov=src --cov-report=xml:coverage.xml
 
     - name: Fix coverage report paths
+      working-directory: backend/
       run: |
         sed -i 's|/home/runner/work/ecommerce/ecommerce/backend/||g' coverage.xml
 
