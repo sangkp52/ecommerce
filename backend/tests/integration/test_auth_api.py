@@ -125,4 +125,4 @@ def test_metrics_not_crash():
 
     res = client.get("/metrics")
 
-    assert res.status_code == 200s
+    assert res.status_code == 200
