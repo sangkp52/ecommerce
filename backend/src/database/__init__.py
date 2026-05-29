@@ -1,10 +1,9 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 
-MONGO_URI = os.getenv("MONGO_URI") 
+MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27018")
 
-client = AsyncIOMotorClient(MONGO_URI)
-db = client["ecommerce"]
 
 def get_db():
-    return db
+    client = AsyncIOMotorClient(MONGO_URI)
+    return client["ecommerce"]

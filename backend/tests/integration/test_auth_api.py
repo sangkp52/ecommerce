@@ -1,82 +1,127 @@
 import pytest
 from datetime import datetime
-from httpx import ASGITransport, AsyncClient
+from fastapi.testclient import TestClient
+from httpx import AsyncClient
 from application import create_app
+from bson import ObjectId
 
-# Khởi tạo app 
 app = create_app()
 
 @pytest.fixture
-async def client():
-    # Sử dụng ASGITransport để đồng bộ hóa với app
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-        yield ac
+def client():
+    app = create_app()
+    return TestClient(app)
 
-# --- UNIT & INTEGRATION TESTS ---
 
-@pytest.mark.asyncio
-async def test_root(client):
-    response = await client.get("/")
+def test_root(client):
+    response = client.get("/")
     assert response.status_code == 200
 
-@pytest.mark.asyncio
-async def test_signup(client):
+
+def test_signup(client):
     random_email = f"test_{datetime.utcnow().timestamp()}@example.com"
-    response = await client.post("/auth/signup", json={
+
+    response = client.post("/auth/signup", json={
         "email": random_email,
         "password": "123456",
         "password_confirmation": "123456"
     })
+
     data = response.json()
-    if response.status_code == 200:
-        assert "email" in data
-    else:
+    if "error" in data and data["error"] == "User already exists":
+        # Optional: assert correct error
         assert response.status_code == 400
+    else:
+        assert response.status_code == 200
+        assert "email" in data
 
 @pytest.mark.asyncio
-async def test_login(client):
-    response = await client.post("/auth/login", json={"email": "test@example.com", "password": "123456"})
-    assert response.status_code == 200
+async def test_login():
+    async with AsyncClient(app=app, base_url="http://test") as client:
+        response = await client.post("/auth/login", json={"email": "test@example.com", "password": "123456"})
+        assert response.status_code == 200
         
 @pytest.mark.asyncio
-async def test_crud_product(client):
-    payload = {"name": "Test Product", "description": "This is a test product", "price": 100.0}
-    response = await client.post("/products/", json=payload)
-    assert response.status_code == 200
-    
-    product = response.json()
-    product_id = str(product.get("_id") or product.get("id") or "")
-    assert product_id, "Backend không trả về ID"
-    
-    # Test GET, UPDATE, DELETE
-    assert (await client.get("/products/")).status_code == 200
-    assert (await client.put(f"/products/{product_id}", json={"price": 150.0})).status_code == 200
-    assert (await client.delete(f"/products/{product_id}")).status_code == 204
-    assert (await client.get(f"/products/{product_id}")).status_code == 404
+async def test_crud_product():
+    async with AsyncClient(app=app, base_url="http://test") as client:
 
-# --- METRICS & ROUTE TESTS ---
+        # CREATE
+        payload = {
+            "name": "Test Product",
+            "description": "This is a test product",
+            "price": 100.0
+        }
 
-@pytest.mark.asyncio
-async def test_metrics_endpoint_exists(client):
-    response = await client.get("/metrics")
+        response = await client.post("/products/", json=payload)
+        assert response.status_code == 200
+
+        product = response.json()
+        
+        # Lấy ID linh hoạt từ cả '_id' hoặc 'id' phòng trường hợp Pydantic mapping
+        product_id = str(product.get("_id") or product.get("id") or "")
+        
+        # Kiểm tra xem ID có bị rỗng không, nếu rỗng sẽ in ra toàn bộ response để debug
+        assert product_id, f"Backend không trả về ID hợp lệ. Dữ liệu nhận được: {product}"
+
+        # GET ALL
+        response = await client.get("/products/")
+        assert response.status_code == 200
+
+        # GET ONE
+        response = await client.get(f"/products/{product_id}")
+        assert response.status_code == 200
+
+        product_data = response.json()
+        assert isinstance(product_data, dict), f"Kỳ vọng dict nhưng nhận được {type(product_data)}"
+        assert product_data["name"] == "Test Product"
+
+        # UPDATE 
+        update_payload = {
+            "price": 150.0
+        }
+
+        response = await client.put(
+            f"/products/{product_id}",
+            json=update_payload
+        )
+
+        assert response.status_code == 200
+        assert response.json()["price"] == 150.0
+
+        # DELETE
+        response = await client.delete(f"/products/{product_id}")
+        assert response.status_code == 204
+
+        # VERIFY DELETE
+        response = await client.get(f"/products/{product_id}")
+        assert response.status_code == 404
+
+
+def test_metrics_endpoint_exists(client):
+    response = client.get("/metrics")
+
     assert response.status_code == 200
     assert "http_requests_total" in response.text
 
-@pytest.mark.asyncio
-async def test_request_generates_metrics(client):
-    await client.get("/") 
-    metrics = await client.get("/metrics")
+def test_request_generates_metrics(client):
+    client.get("/")  # hit endpoint
+
+    metrics = client.get("/metrics")
+
     assert metrics.status_code == 200
     assert "http_requests_total" in metrics.text
 
-@pytest.mark.asyncio
-async def test_app_routes_work(client):
-    response = await client.get("/")
+def test_app_routes_work(client):
+    response = client.get("/")
+
     assert response.status_code in [200, 401, 404]
 
-@pytest.mark.asyncio
-async def test_metrics_not_crash(client):
+def test_metrics_not_crash(client):
+    client = TestClient(create_app())
+
     for _ in range(5):
-        await client.get("/")
-    res = await client.get("/metrics")
+        client.get("/")
+
+    res = client.get("/metrics")
+
     assert res.status_code == 200
