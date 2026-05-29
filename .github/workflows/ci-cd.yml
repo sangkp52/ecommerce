@@ -86,7 +86,9 @@ jobs:
         args: >
           -Dsonar.projectKey=sangkp52_ecommerce
           -Dsonar.organization=sangkp52
-          -Dsonar.python.coverage.reportPaths=backend/coverage.xml
+          -Dsonar.projectBaseDir=backend
+          -Dsonar.sources=src
+          -Dsonar.python.coverage.reportPaths=coverage.xml
 
         
   deploy-production:
