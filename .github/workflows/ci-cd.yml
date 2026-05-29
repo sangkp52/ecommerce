@@ -89,6 +89,7 @@ jobs:
           -Dsonar.projectBaseDir=backend
           -Dsonar.sources=src
           -Dsonar.python.coverage.reportPaths=coverage.xml
+          -Dsonar.python.version=3.11
 
         
   deploy-production:
