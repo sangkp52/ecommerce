@@ -18,6 +18,3 @@ def create_app() -> FastAPI:
     app.include_router(products_routers)
 
     return app
-
-
-app = create_app()

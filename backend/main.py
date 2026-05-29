@@ -15,5 +15,6 @@ app.include_router(auth_router)
 # Prometheus metrics
 Instrumentator().instrument(app).expose(
     app,
-    endpoint="/metrics"
+    endpoint="/metrics",
+    include_in_schema=False
 )
