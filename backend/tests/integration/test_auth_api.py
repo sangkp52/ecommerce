@@ -5,9 +5,10 @@ from httpx import AsyncClient
 from application import create_app
 from bson import ObjectId
 
+app = create_app()
+
 @pytest.fixture
 def client():
-    app = create_app()
     return TestClient(app)
 
 
