@@ -30,6 +30,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v5
+      with:
+        fetch-depth: 0
 
     - name: Setup Python
       uses: actions/setup-python@v6
@@ -74,7 +76,12 @@ jobs:
         PYTHONPATH: .
       run: |
         cd backend
-        pytest tests/unit tests/integration --cov=src --cov-report=term-missing -v
+        python -m pytest --cov=src --cov-report=xml
+
+    - name: Fix coverage report paths
+      working-directory: backend/
+      run: |
+        sed -i 's|/home/runner/work/ecommerce/ecommerce/backend/||g' coverage.xml
 
 
     - name: SonarCloud Scan
@@ -84,9 +91,13 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         args: >
+          -Dsonar.python.version=3.11
           -Dsonar.projectKey=sangkp52_ecommerce
           -Dsonar.organization=sangkp52
-          -Dsonar.branch.name=dev
+          -Dsonar.projectBaseDir=backend
+          -Dsonar.sources=src
+          -Dsonar.python.coverage.reportPaths=coverage.xml
+         
 
 
   deploy-staging:
