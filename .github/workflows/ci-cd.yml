@@ -74,7 +74,7 @@ jobs:
         PYTHONPATH: .
       run: |
         cd backend
-          pytest --cov=src --cov-report=term-missing --cov-report=xml
+          pytest --cov=src --cov-report=xml:coverage.xml
 
     
     - name: SonarCloud Scan
@@ -86,7 +86,7 @@ jobs:
         args: >
           -Dsonar.projectKey=sangkp52_ecommerce
           -Dsonar.organization=sangkp52
-          -Dsonar.branch.name=main
+          -Dsonar.python.coverage.reportPaths=backend/coverage.xml
 
         
   deploy-production:
