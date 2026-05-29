@@ -76,7 +76,7 @@ jobs:
         PYTHONPATH: .
       run: |
         cd backend
-          pytest --cov=src --cov-report=xml:coverage.xml
+        pytest --cov=src --cov-report=xml:coverage.xml
 
     - name: Fix coverage report paths
       working-directory: backend/
@@ -91,12 +91,13 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         args: >
+          -Dsonar.python.version=3.11
           -Dsonar.projectKey=sangkp52_ecommerce
           -Dsonar.organization=sangkp52
           -Dsonar.projectBaseDir=backend
           -Dsonar.sources=src
           -Dsonar.python.coverage.reportPaths=coverage.xml
-          -Dsonar.python.version=3.11
+          
 
         
   deploy-production:
