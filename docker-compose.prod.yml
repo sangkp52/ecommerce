@@ -7,4 +7,4 @@ services:
   frontend:
     image: sangkp52/ecommerce-frontend:latest
     ports:
-      - "5174:5173"
+      - "3001:3000"
